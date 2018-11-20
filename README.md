@@ -94,7 +94,9 @@
         * sử dụng nhiều phần cứng 
 7. Load balancer
 
-- Load balancer là một phương thức phân phối request từ clients tới các servers hoặc database.
+- Load balancer là một thiết bị phân phối request từ clients tới các servers hoặc database. Load balancer giúp giảm tải cho mỗi nodes. ngăn chặn tài nguyên bị quá tải. 
+    * <b>Layer 4 load balancing</b> là một loại của load balancer hoạt động tại tâng <i>transport layer</i>, Loại này  dựa trên thông tin về địa chỉ ip của nguồn và đích trên header của package của request, mà không dựa tren nội dung của packet để từ đó quyết định server nào sẽ xử lý request này.
+    * <b>Layer 7 load balancing </b>là một loại load balancer , loại này dựa trên nội dung của package trong request để quyết định server nào sẽ xử lý request này.
 - <b>Các thuật toán và phương thức cho load balancing</b>
     * <b>Least connection Method</b>:  Khi load balancer nhận được một requests từ client. nó sẽ chuyển hương request này tới server đang xử lý ít conections nhất.
     * <b>Least loaded Mothod</b>: Khi load balancer nhận được một requests từ client. nó sẽ chuyển hương request này tới server đang chịu tải ít nhất. Cần phân biệt giữa hai khái niệm Least connection với Least loaded
@@ -116,3 +118,26 @@
     - Ví dụ nếu server 1 có weigh là 3, server 2 có weight là 1, thì lúc này load balancer sẽ phân phối 3 requests cho server 1 và 1 request cho server 2
 
     * Random Method:  Phương pháp này sử dụng một thuật toán ngẫu nhiên để phân bố các requests từ clients tới các servers sao cho đồng đều.
+8. Kiến trúc Nginx
+- Nginx sử dụng reverse proxy và load balancer
+- không như các server truyền thống sử dungj thread xử lý các request, NGINX sử dụng một kiến trúc không đồng bộ để xử lý các request.
+- Nginx có kiến trúc xử lý dạng “sự kiện” (event) không phải tạo process mới cho mỗi truy vấn. Thay vào đó, nó xử lý truy vấn trong một thread duy nhất. Master process sẽ quản lý nhiều worker processes mà thực sự quản lý việc xử lý truy vấn. Dạng quản lý sự kiện như vậy của Nginx phân tán truy vấn một cách hiệu quả để đạt hiệu quả quản lý tốt hơn.
+
+![a](./images/architecture.png)
+
+- Nginx sử dụng một predictable process model bào gồm:
+    * The master process : Thực hiện việc đọc file cấu hình cho server và tạo ra một số lượng nhỏ các process con
+    * The worker processes : Khi server được active,  mỗi worker process là một single thread và chạy độc lập trên một core của , nó có thể xử lý rất nhiều connections theo cơ chế non-blocking, khác xa với các máy chủ truyền thồng sử dụng multil thread sử dụng cơ chế blocking
+
+    1.  worker process chờ đợi các sự kiện trên listen và connection sockets.
+    2. khi các sự kiện xuất hiện trên sockets thì workers sẽ sử lý chúng.
+  
+9. Cache
+- Cache là kĩ thuật cải thiện thời gian load trang và giảm tải của server và database bằng việc lưu lại những nội dung được truy cập thường xuyên, sau này nếu có một request yêu cầu nội dung này thì không cần phải truy cập vào database để đọc.
+- Một số loại Caching 
+    * Client Caching
+    * CDN Caching
+    * Web Server Caching
+    * Database Caching
+    * Application Caching
+

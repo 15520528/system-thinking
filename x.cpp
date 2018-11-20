@@ -52,89 +52,105 @@ void deleteMin(){
     sort(cache.begin(), cache.end(), sortbysec);
     cache.erase(cache.begin());
 }*/
-int cache_max_size = 5;
-map<string, int> cache;
-map<string, string> indices;
+class Cache
+{
+  public:
+    int cache_max_size;
+    map<string, int> cache;
+    map<string, string> indices;
 
-bool pairCompare(pair<string, int> i, pair<string, int> j)
-{
-    return i.second < j.second;
-}
-void insertCache(string key, string values)
-{
-    if (cache.size() != cache_max_size) //nếu cahe page chưa đạt max size
+    bool static pairCompare(pair<string, int> i, pair<string, int> j)
     {
-        if (cache.find(key) == cache.end())
-        { //nếu key chưa tồn tại
-            cache[key] = 1;
-            indices.insert(pair<string, string>(key, values));
+        return i.second < j.second;
+    }
+    void insertCache(string key, string values)
+    {
+        if (cache.size() != cache_max_size) //nếu cahe page chưa đạt max size
+        {
+            if (cache.find(key) == cache.end())
+            { //nếu key chưa tồn tại
+                cache[key] = 1;
+                indices.insert(pair<string, string>(key, values));
+            }
+            else
+            {
+                cache[key]++;
+            }
         }
         else
-        {
-            cache[key]++;
+        { //ngược lại thì xóa block có tần suất thấp nhất
+            if (cache.find(key) == cache.end())
+            {
+                map<string, int>::iterator it = min_element(cache.begin(), cache.end(), pairCompare); // phần tử có tần suất thấp nhất
+                cout << it->first << " " << it->second << endl;
+                cache.erase(it); //xóa phần tử
+                indices.erase(it->first);
+                cache[key] = 1; //thêm giá trị mới vào
+                indices.insert(pair<string, string>(key, values));
+            }
+            else
+            {
+                cache[key]++;
+            }
         }
     }
-    else
-    { //ngược lại thì xóa block có tần suất thấp nhất
-        if (cache.find(key) == cache.end())
-        {
-            map<string, int>::iterator it = min_element(cache.begin(), cache.end(), pairCompare); // phần tử có tần suất thấp nhất
-            cout << it->first << " " << it->second << endl;
-            cache.erase(it); //xóa phần tử
-            indices.erase(it->first);
-            cache[key] = 1;  //thêm giá trị mới vào
-            indices.insert(pair<string, string>(key, values));
-        }
-        else{
-            cache[key]++;
-        }
-    }
-}
 
-void getCache()
-{
-    cout << "\ncache\n";
-    map<string, int>::iterator it;
-    for (it = cache.begin(); it != cache.end(); ++it)
-        std::cout << it->first << " => " << it->second << '\n';
-}
-void getIndices()
-{
-    cout << "\nindiecs\n";
-    map<string, string>::iterator it;
-    for (it = indices.begin(); it != indices.end(); ++it)
-        std::cout << it->first << " => " << it->second << '\n';
-}
-bool containKey(string key)
+    void getCache()
     {
-        return cache.find(key) == cache.end(); //true-> tồn tại key
+        cout << "\ncache\n";
+        map<string, int>::iterator it;
+        for (it = cache.begin(); it != cache.end(); ++it)
+            std::cout << it->first << " => " << it->second << '\n';
+    }
+    void getIndices()
+    {
+        cout << "\nindiecs\n";
+        map<string, string>::iterator it;
+        for (it = indices.begin(); it !=
+                                   indices.end();
+             ++it)
+            std::cout << it->first << " => " << it->second << '\n';
+    }
+    bool containKey(string key)
+    {
+        return !(cache.find(key) == cache.end()); //true-> tồn tại key
     }
     string get(string key)
     {
         return indices[key];
     }
+};
 int main(int argc, char const *argv[])
 {
-    insertCache("abc.txt", "1234");
-    insertCache("abc.txt", "1234");
-    insertCache("cat.png", "1234");
-    insertCache("cat.png", "1234");
-    insertCache("cat.png", "1234");
-    insertCache("d", "1234");
-    insertCache("h", "1234");
-    insertCache("g", "1234");
-    insertCache("g", "1234");
-    insertCache("g", "1234");
-    insertCache("g", "1234");
-    insertCache("g", "1234");
-    insertCache("g", "1234");
-    insertCache("d", "1234");
-    insertCache("m", "1234");
+    Cache cache;
+    cache.cache_max_size = 5;
+    char cc[] = "1234";
+    cache.insertCache("abc.txt", "1234");
+    cache.insertCache("abc.txt", "1234");
+    cache.insertCache("cat.png", "1234");
+    cache.insertCache("cat.png", "1234");
+    cache.insertCache("cat.png", "1234");
+    cache.insertCache("d", "1234");
+    cache.insertCache("h", "1234");
+    cache.insertCache("g", "1234");
+   cache. insertCache("g", "1234");
+    cache.insertCache("g", "1234");
+    cache.insertCache("g", "1234");
+    cache.insertCache("g", "1234");
+    cache.insertCache("g", "1234");
+    cache.insertCache("d", "1234");
+    cache.insertCache(cc, cc);
+    cache.insertCache(cc, cc);
+    cache.insertCache(cc, cc);
+   
     //insertCache("m", "1234");
     //deleteMin();*/
-    cout << cache.size() << endl;
-    getCache();
+    
 
-    getIndices();
+    cache.getCache();
+
+    cache.getIndices();
+    char arr[]="m";
+    cout<<cache.containKey(arr);
     return 0;
 }
